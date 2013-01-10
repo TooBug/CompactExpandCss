@@ -17,16 +17,16 @@ usage
 
 select the css code
 
- *{
-  padding:0
- }
+	*{
+		padding:0
+	}
   
 and press `ctrl + alt + [` , the code becomes
 
-  *{ padding:0}
+	*{ padding:0}
   
 select the css code and press `ctrl + alt + ]` , the code becomes
 
- *{
-  padding:0
- }
+	*{
+		padding:0
+	}
