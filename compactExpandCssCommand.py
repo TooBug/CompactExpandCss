@@ -4,7 +4,7 @@ import re
 
 
 class CompactExpandCssCommand(sublime_plugin.TextCommand):
-  def run(self, edit, action='compact'):
+	def run(self, edit, action='compact'):
 		rule_starts = self.view.find_all('\{')
 		rule_ends = self.view.find_all('\}')
 

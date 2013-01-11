@@ -3,6 +3,7 @@ CompactExpandCss
 
 a sublime plugin to compact and expand css code
 
+original code: <https://gist.github.com/2863474>
 
 
 install
@@ -21,11 +22,11 @@ select the css code
 		padding:0
 	}
   
-and press `ctrl + alt + [` , the code becomes
+and press `ctrl + alt(command) + [` , the code becomes
 
 	*{ padding:0}
   
-select the css code and press `ctrl + alt + ]` , the code becomes
+select the css code and press `ctrl + alt(command) + ]` , the code becomes
 
 	*{
 		padding:0
