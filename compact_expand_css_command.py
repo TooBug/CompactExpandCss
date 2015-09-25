@@ -11,19 +11,16 @@ class CompactExpandCssCommand(sublime_plugin.TextCommand):
             rules1 = self.view.find_all(regx)
             for x in rules1:
                 self.view.replace(edit, self.view.find(regx, x.a), "}\n")
-        # Format all the code
+        # Format all the code End
 
         rule_starts = self.view.find_all('\{')
         rule_ends = self.view.find_all('\}')
-        print (len(rule_starts) == len(rule_ends))
-        print (rule_starts)
-        print (rule_ends)
+
         if len(rule_starts) != len(rule_ends):
             sublime.message_dialog("value not match!")
             return
 
-        tmp = Ele.getArea(rule_starts, rule_ends)
-
+        area = Ele.getArea(rule_starts, rule_ends)
 
         rules_regions = list()
         regions_to_process = list()
@@ -32,28 +29,15 @@ class CompactExpandCssCommand(sublime_plugin.TextCommand):
         if len(selections) == 1 and selections[0].empty():
             selections = [sublime.Region(0, self.view.size())]
 
-        # for i in range(len(rule_starts)):
-        #     rule_region = sublime.Region(rule_starts[i].a, rule_ends[i].b)
-        #     rules_regions.append(rule_region)
-        #     for sel in selections:
-        #         if sel.intersects(rule_region):
-        #             regions_to_process.append(rule_region)
-        #             break
-
-        for i in range(len(tmp)):
-            rule_region = tmp[i]
+        for i in range(len(area)):
+            rule_region = area[i]
             rules_regions.append(rule_region)
             for sel in selections:
                 if sel.intersects(rule_region):
                     regions_to_process.append(rule_region)
                     break
 
-
-
-
-
         regions_to_process.reverse()
-        print("格式化序列: ", regions_to_process)
         self.process_rules_regions(regions_to_process, action, edit)
 
     def process_rules_regions(self, regions, action, edit):
@@ -91,15 +75,15 @@ class CompactExpandCssCommand(sublime_plugin.TextCommand):
             match = re.match(r"\{([^\}]*)\}", content)
 
             rules = match.group(1).split(';')
-            # rules = [r.strip() for r in rules]
-            newRules = []
+            
+            tmpRules = []
             for r in rules:
                 key = r.strip()
                 attr = key.split(':')
                 attr = [a.strip() for a in attr]
                 attr = ': '.join(attr)
-                newRules.append(attr)
-            rules = '; '.join(newRules)
+                tmpRules.append(attr)
+            rules = '; '.join(tmpRules)
 
             view.replace(edit, collapse_region, '{ ' + rules + '}')
 
@@ -109,29 +93,26 @@ class CompactExpandCssCommand(sublime_plugin.TextCommand):
         for expand_region in regions:
             content = view.substr(expand_region)
 
-            print(expand_region.deep)
-
             if re.match(r"\{[^\}]*\{", content):
                 continue
 
+            indent = ''
             if expand_region.deep > 0:
                 indent = '\t'
-            else:
-                indent = ''
 
             match = re.match(r"\{([^\}]*)\}", content)
 
             rules = match.group(1).split(';')
             rules = filter(lambda r: r.strip(), rules)
-            # rules = ['\t' + r.strip() + ';\n' for r in rules]
-            newRules = []
+            
+            tmpwRules = []
             for r in rules:
                 key = r.strip()
                 attr = key.split(':')
                 attr = [a.strip() for a in attr]
                 attr = ': '.join(attr)
-                newRules.append('\t' + indent + attr + ';\n')
-            rules = ''.join(newRules)
+                tmpwRules.append('\t' + indent + attr + ';\n')
+            rules = ''.join(tmpwRules)
 
             view.replace(edit, expand_region, '{\n' + rules + indent + '}')
 
@@ -162,25 +143,17 @@ class ExpandToCssRuleCommand(sublime_plugin.TextCommand):
 
 
 class Ele(sublime.Region):
-    """css object"""
+    """get regions"""
     deep = 0
-    childEle = None
-    # def __init__(self):
-        # super(Ele, self).__init__()
-        # self.arg = arg
-        # print (rule_starts)
-        # pass
 
     def getArea(rule_starts, rule_ends):
         length = len(rule_starts)
         area = list()
-        childArea = list()
         pop = list()
         i = 0
         j = 0
 
         while j < length:
-
             r_end = rule_ends[j].b
 
             if i < length:
@@ -189,36 +162,10 @@ class Ele(sublime.Region):
                 if l_start < r_end:
                     pop.append(l_start)
                     i = i + 1
-                    # print("i: ", i)
                     continue
             t = Ele(pop.pop(), r_end)
             t.deep = len(pop)
             area.append(t)
-            # print(Ele(pop.pop(), r_end))
-            # pop.append(l_start)
-            # i = i + 1
             j = j + 1
-            # print("j: ", j)
 
-        print("**构造序列: ", area)
         return area
-
-        # print(pop)
-
-        # for i in range(len(rule_starts)):
-        #     l_start = rule_starts[i].a
-        #     r_end = rule_ends[j].b
-
-        #     # l_start_next = rule_starts[i+1].a
-
-        #     # pop.append(l_start)
-        #     if l_start < r_end:
-        #         pop.append(l_start)
-        #         # print (Ele(l_start_next, r_end))
-        #     else:
-        #         print(Ele(pop.pop(), r_end))
-        #         pop.append(l_start)
-        #         j = j + 1
-
-        #     if i >= length - 1:
-        #         break
